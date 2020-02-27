@@ -4,17 +4,20 @@ function sort(list) {
     }
 
     let didSwap = true;
+    let completeNo = 0;
 
     while (didSwap) {
         didSwap = false;
 
-        for (let i = 0; i < (list.length - 1); i++) {
+        for (let i = 0; i < (list.length - 1 - completeNo); i++) {
             if (list[i] > list[i + 1]) {
                 swap(list, i, i + 1);
 
                 didSwap = true;
             }
         }
+
+        completeNo++;
     }
 
     return list;
