@@ -71,6 +71,8 @@ LinkedList.prototype.size = function () {
     return count;
 }
 
+test();
+
 function test() {
     shouldBeEmpty();
     shouldAddNode();
@@ -212,5 +214,3 @@ function shouldNotDeleteNegativeNode() {
 
     console.log('OK');
 }
-
-test();
