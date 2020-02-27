@@ -23,7 +23,7 @@ LinkedList.prototype.add = function (data) {
 }
 
 LinkedList.prototype.get = function (index) {
-    if(typeof index !== 'number' || index < 0) {
+    if (typeof index !== 'number' || index < 0) {
         return null;
     }
 
@@ -40,6 +40,22 @@ LinkedList.prototype.get = function (index) {
     }
 
     return node;
+}
+
+LinkedList.prototype.delete = function (index) {
+    const previous = this.get(index - 1);
+
+    if (!previous) {
+        return;
+    }
+
+    const current = previous.next;
+
+    if (!current) {
+        return;
+    }
+
+    previous.next = current.next;
 }
 
 LinkedList.prototype.size = function () {
@@ -62,6 +78,9 @@ function test() {
     shouldGetNode();
     shouldNotGetNode();
     shouldNotGetNegativeNode();
+    shouldDeleteNode();
+    shouldNotDeleteNode();
+    shouldNotDeleteNegativeNode();
 }
 
 function shouldBeEmpty() {
@@ -141,6 +160,54 @@ function shouldNotGetNegativeNode() {
 
     if (node) {
         throw new Error('shouldNotGetNegativeNode');
+    }
+
+    console.log('OK');
+}
+
+function shouldDeleteNode() {
+    const list = new LinkedList();
+
+    list.add('something');
+    list.add('more');
+    list.add('even');
+
+    list.delete(1);
+
+    if (list.size() !== 2) {
+        throw new Error('shouldDeleteNode');
+    }
+
+    console.log('OK');
+}
+
+function shouldNotDeleteNode() {
+    const list = new LinkedList();
+
+    list.add('something');
+    list.add('more');
+    list.add('even');
+
+    list.delete(6);
+
+    if (list.size() !== 3) {
+        throw new Error('shouldNotDeleteNode');
+    }
+
+    console.log('OK');
+}
+
+function shouldNotDeleteNegativeNode() {
+    const list = new LinkedList();
+
+    list.add('something');
+    list.add('more');
+    list.add('even');
+
+    list.delete(-5);
+
+    if (list.size() !== 3) {
+        throw new Error('shouldNotDeleteNode');
     }
 
     console.log('OK');
