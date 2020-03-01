@@ -100,19 +100,26 @@ function verifyMinHeap(node) {
 }
 
 function drawTree(root, container) {
-    const el = document.createElement('div');
+    const treeEl = document.createElement('div');
+    treeEl.className = 'tree';
 
-    el.className = 'node';
-    el.innerHTML = root.value;
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'children';
 
-    container.appendChild(el)
+    const rootEl = document.createElement('div');
+    rootEl.className = 'value';
+    rootEl.innerHTML = root.value;
+
+    treeEl.appendChild(rootEl);
+    treeEl.appendChild(childrenEl);
+    container.appendChild(treeEl)
 
     if (root.left) {
-        drawTree(root.left, el);
+        drawTree(root.left, childrenEl);
     }
 
     if (root.right) {
-        drawTree(root.right, el);
+        drawTree(root.right, childrenEl);
     }
 }
 
