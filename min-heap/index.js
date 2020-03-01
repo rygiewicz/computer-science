@@ -18,22 +18,53 @@ class Tree {
 
     add(value) {
         const node = new TreeNode(value);
-        const vacantNode = findVacantTreeNode(this.root);
+        const vacantNode = getVacantNode(this.root);
 
         if (!vacantNode.left) {
             vacantNode.left = node;
         } else {
             vacantNode.right = node;
         }
+
+        this.fixOrder(node);
+    }
+
+    fixOrder(node) {
+        const parent = getParentNode(this.root, node);
+
+        if (!parent) {
+            return;
+        }
+
+        if (parent.value > node.value) {
+            const pv = parent.value;
+
+            parent.value = node.value;
+            node.value = pv;
+        }
+
+        this.fixOrder(parent);
     }
 }
 
-function findVacantTreeNode(node) {
+function getParentNode(root, node) {
+    if (!root) {
+        return null;
+    }
+
+    if (root.left === node || root.right === node) {
+        return root;
+    }
+
+    return getParentNode(root.left, node) || getParentNode(root.right, node)
+}
+
+function getVacantNode(node) {
     if (!node.left || !node.right) {
         return node;
     }
 
-    return findVacantTreeNode(node.left) || findVacantTreeNode(node.right)
+    return getVacantNode(node.left) || getVacantNode(node.right)
 }
 
 function getTreeSize(node) {
@@ -68,6 +99,23 @@ function verifyMinHeap(node) {
     }
 }
 
+function drawTree(root, container) {
+    const el = document.createElement('div');
+
+    el.className = 'node';
+    el.innerHTML = root.value;
+
+    container.appendChild(el)
+
+    if (root.left) {
+        drawTree(root.left, el);
+    }
+
+    if (root.right) {
+        drawTree(root.right, el);
+    }
+}
+
 test();
 
 function test() {
@@ -76,6 +124,7 @@ function test() {
     shouldHaveCorrectSize();
     shouldAddNode();
     shouldFollowRules();
+    shouldDrawTree();
 }
 
 function shouldCreateNode() {
@@ -113,8 +162,9 @@ function shouldHaveCorrectSize() {
 function shouldAddNode() {
     const tree = new Tree(new TreeNode(77));
     tree.add(22);
+    tree.add(100);
 
-    if (tree.size() !== 2) {
+    if (tree.size() !== 3) {
         throw new Error('shouldAddNode');
     }
 
@@ -124,8 +174,25 @@ function shouldAddNode() {
 function shouldFollowRules() {
     const tree = new Tree(new TreeNode(75));
     tree.add(25);
+    tree.add(44);
+    tree.add(200);
+    tree.add(200);
+    tree.add(300);
+    tree.add(2);
 
     verifyMinHeap(tree.root);
 
     console.log('OK');
+}
+
+function shouldDrawTree() {
+    const tree = new Tree(new TreeNode(75));
+    tree.add(25);
+    tree.add(44);
+    tree.add(200);
+    tree.add(200);
+    tree.add(300);
+    tree.add(2);
+
+    drawTree(tree.root, document.body);
 }
