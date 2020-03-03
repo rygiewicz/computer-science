@@ -27,6 +27,16 @@ class Tree {
         }
 
         this.fixOrder(node);
+
+        return node;
+    }
+
+    delete() {
+
+    }
+
+    getLastParentNode() {
+        return getLastParentNode(this.root);
     }
 
     fixOrder(node) {
@@ -59,12 +69,39 @@ function getParentNode(root, node) {
     return getParentNode(root.left, node) || getParentNode(root.right, node)
 }
 
-function getVacantNode(node) {
-    if (!node.left || !node.right) {
-        return node;
+function getVacantNode(root) {
+    if (!root.left || !root.right) {
+        return root;
     }
 
-    return getVacantNode(node.left) || getVacantNode(node.right)
+    const leftSize = getTreeSize(root.left);
+    const rightSize = getTreeSize(root.right);
+
+    if (leftSize > rightSize) {
+        return getVacantNode(root.right);
+    }
+
+    return getVacantNode(root.left);
+}
+
+function getLastParentNode(root) {
+    if (!hasChildren(root)) {
+        return null;
+    }
+
+    if (root.right && hasChildren(root.right)) {
+        return getLastParentNode(root.right);
+    }
+
+    if (hasChildren(root.left)) {
+        return getLastParentNode(root.left);
+    }
+
+    return root;
+}
+
+function hasChildren(node) {
+    return !!node.right || !!node.left;
 }
 
 function getTreeSize(node) {
@@ -132,6 +169,7 @@ function test() {
     shouldAddNode();
     shouldFollowRules();
     shouldDrawTree();
+    shouldGetLastParentNode();
 }
 
 function shouldCreateNode() {
@@ -202,4 +240,23 @@ function shouldDrawTree() {
     tree.add(2);
 
     drawTree(tree.root, document.body);
+}
+
+function shouldGetLastParentNode() {
+    const tree = new Tree(new TreeNode(77));
+    tree.add(240);
+    const lastParent = tree.add(125);
+    tree.add(144);
+    tree.add(500);
+    tree.add(320);
+
+    drawTree(tree.root, document.body);
+
+    const result = tree.getLastParentNode();
+
+    if (result !== lastParent) {
+        throw new Error('shouldGetLastParentNode');
+    }
+
+    console.log('OK');
 }
