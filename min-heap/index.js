@@ -35,13 +35,14 @@ class Tree {
         const lastParent = getLastParentNode(this.root);
 
         if (lastParent.right) {
-            this.root.value = lastParent.right.value;
+            swapValues(this.root, lastParent.right);
             lastParent.right = null;
         } else {
-            this.root.value = lastParent.left.value;
+            swapValues(this.root, lastParent.left);
             lastParent.left = null;
         }
 
+        bubbleDown(this.root);
     }
 
     getLastParentNode() {
@@ -57,22 +58,30 @@ function bubbleUp(root, node) {
     }
 
     if (parent.value > node.value) {
-        const pv = parent.value;
-
-        parent.value = node.value;
-        node.value = pv;
+        swapValues(parent, node);
     }
 
     bubbleUp(root, parent);
 }
 
-function bubbleDown(node) {
-    if (!node.left || !node.right) {
+function bubbleDown(parent) {
+    if (!parent.left) {
         return;
     }
 
-    const nodeValue = node.value;
+    const child = (!parent.right || parent.right.value > parent.left.value) ? parent.left : parent.right;
 
+    if (parent.value > child.value) {
+        swapValues(parent, child);
+        bubbleDown(child);
+    }
+}
+
+function swapValues(node1, node2) {
+    const tmp = node1.value;
+
+    node1.value = node2.value;
+    node2.value = tmp;
 }
 
 function getParentNode(root, node) {
@@ -92,7 +101,7 @@ function getVacantNode(root) {
         return root;
     }
 
-    const leftFull = isFull(root.left);
+    const leftFull = isFullTree(root.left);
     const leftSize = getTreeSize(root.left);
     const rightSize = getTreeSize(root.right);
 
@@ -103,7 +112,7 @@ function getVacantNode(root) {
     return getVacantNode(root.left);
 }
 
-function isFull(root) {
+function isFullTree(root) {
     const size = getTreeSize(root);
     const depth = Math.log2(size + 1);
 
@@ -111,26 +120,39 @@ function isFull(root) {
 }
 
 function getLastParentNode(root) {
-    if (!hasChildren(root)) {
-        return null;
+    const leftFull = isFullTree(root.left);
+    const rightFull = isFullTree(root.right);
+    const leftSize = getTreeSize(root.left);
+    const rightSize = getTreeSize(root.right);
+
+    if (leftSize === 0) {
+        throw new Error('not a parent')
     }
 
-    if (root.right && hasChildren(root.right)) {
-        return getLastParentNode(root.right);
+    if (leftSize === 1) {
+        return root;
     }
 
-    if (hasChildren(root.left)) {
+    if (rightSize === 1) {
         return getLastParentNode(root.left);
     }
 
-    return root;
-}
+    if (leftFull && !rightFull) {
+        return getLastParentNode(root.right);
+    }
 
-function hasChildren(node) {
-    return !!node.right || !!node.left;
+    if (leftSize == rightSize) {
+        return getLastParentNode(root.right);
+    }
+
+    return getLastParentNode(root.left);
 }
 
 function getTreeSize(root) {
+    if (!root) {
+        return 0;
+    }
+
     let size = 1;
 
     if (root.left) {
@@ -195,7 +217,7 @@ function test() {
     shouldAddNode();
     shouldFollowRules();
     shouldGetLastParentNode();
-    //shouldDelete();
+    shouldDelete();
     shouldDrawTree();
 }
 
@@ -301,6 +323,7 @@ function shouldGetLastParentNode() {
 function shouldDelete() {
     const tree = new Tree(new TreeNode(232));
     tree.add(256);
+    tree.add(61);
     tree.add(128);
     tree.add(900);
     tree.add(3);
@@ -308,13 +331,20 @@ function shouldDelete() {
     tree.add(56);
     tree.add(771);
     tree.add(600);
+    tree.add(62);
+    tree.add(63);
+    tree.add(54);
+
+    const initialSize = tree.size();
 
     verifyMinHeap(tree.root);
 
     tree.delete();
 
-    if (tree.size() !== 8) {
-        throw new Error('shouldAddNode');
+    drawTree(tree.root, document.body);
+
+    if (tree.size() !== initialSize - 1) {
+        throw new Error('shouldDelete');
     }
 
     verifyMinHeap(tree.root);
