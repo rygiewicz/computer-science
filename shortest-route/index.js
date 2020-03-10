@@ -1,9 +1,9 @@
 function Board(width, height) {
     this.width = width;
     this.height = height;
+    this.disabledSquares = {};
 }
 
-Board.prototype.disabledSquares = {};
 Board.prototype.width = 0;
 Board.prototype.height = 0;
 
@@ -16,19 +16,25 @@ Board.prototype.getShortestRoute = function (from, to) {
 
     this.getRoutes(from, to, routes);
 
-    const shortest = routes.reduce((previous, current) => {
+    if (!routes.length) {
+        return [];
+    }
+
+    return routes.reduce((previous, current) => {
         if (current.length < previous.length) {
             return current;
         }
 
         return previous;
     });
-
-    return shortest;
 }
 
 Board.prototype.getRoutes = function (from, to, routes, path = [from]) {
     if (from[0] > to[0] || from[1] > to[1]) {
+        return;
+    }
+
+    if (this.isSquareDisabled(from[0], from[1])) {
         return;
     }
 
@@ -64,6 +70,9 @@ function test() {
     shouldCreateBoard();
     shouldDisableSquare();
     shouldGetShortestRoute();
+    shouldGetShortestRouteAroundDisabledSquares();
+    shouldGetShortestRouteBelowDisabledSquares();
+    shouldGetShortestRouteAboveDisabledSquares();
 }
 
 function shouldCreateBoard() {
@@ -99,6 +108,51 @@ function shouldGetShortestRoute() {
 
     if (shortest.length !== 7) {
         throw new Error('shouldGetShortestRoute');
+    }
+
+    console.log('OK');
+}
+
+function shouldGetShortestRouteAroundDisabledSquares() {
+    const board = new Board(7, 7);
+    board.disableSquare(3, 3);
+
+    shortest = board.getShortestRoute([0, 0], [6, 6]);
+
+    if (shortest.length !== 8) {
+        throw new Error('shouldGetShortestRouteAroundDisabledSquares');
+    }
+
+    console.log('OK');
+}
+
+function shouldGetShortestRouteBelowDisabledSquares() {
+    const board = new Board(7, 7);
+    board.disableSquare(3, 0);
+    board.disableSquare(3, 1);
+    board.disableSquare(3, 2);
+    board.disableSquare(3, 3);
+
+    shortest = board.getShortestRoute([0, 0], [6, 6]);
+
+    if (shortest.length !== 8) {
+        throw new Error('shouldGetShortestRouteBelowDisabledSquares');
+    }
+
+    console.log('OK');
+}
+
+function shouldGetShortestRouteAboveDisabledSquares() {
+    const board = new Board(7, 7);
+    board.disableSquare(3, 6);
+    board.disableSquare(3, 5);
+    board.disableSquare(3, 4);
+    board.disableSquare(3, 3);
+
+    shortest = board.getShortestRoute([0, 0], [6, 6]);
+
+    if (shortest.length !== 8) {
+        throw new Error('shouldGetShortestRouteAboveDisabledSquares');
     }
 
     console.log('OK');
