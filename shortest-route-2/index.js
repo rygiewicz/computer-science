@@ -1,3 +1,23 @@
+function Memo() {
+    this.data = {};
+}
+
+Memo.prototype.getKey = function (from, to) {
+    return [...from, ...to].join('-');
+}
+
+Memo.prototype.getValue = function (from, to) {
+    const key = this.getKey(from, to);
+
+    return this.data[key];
+}
+
+Memo.prototype.setValue = function (from, to, value) {
+    const key = this.getKey(from, to);
+
+    this.data[key] = value;
+}
+
 function Grid(width) {
     this.width = width;
     this.data = {};
@@ -24,7 +44,7 @@ function Board(width, height) {
 Board.prototype.width = 0;
 Board.prototype.height = 0;
 
-Board.prototype.getShortestRoute = function (from, to, memo = {}, path = [from]) {
+Board.prototype.getShortestRoute = function (from, to) {
     const fromX = from[0];
     const fromY = from[1];
     const toX = to[0];
@@ -39,7 +59,7 @@ Board.prototype.getShortestRoute = function (from, to, memo = {}, path = [from])
     }
 
     if (fromX === toX && fromY === toY) {
-        return path;
+        return [to];
     }
 
     const goRight = [fromX + 1, fromY];
@@ -47,12 +67,12 @@ Board.prototype.getShortestRoute = function (from, to, memo = {}, path = [from])
     const goAcross = [fromX + 1, fromY + 1];
 
     const routes = [
-        this.getShortestRoute(goRight, to, memo, [...path, goRight]),
-        this.getShortestRoute(goDown, to, memo, [...path, goDown]),
-        this.getShortestRoute(goAcross, to, memo, [...path, goAcross]),
+        this.getShortestRoute(goRight, to),
+        this.getShortestRoute(goDown, to),
+        this.getShortestRoute(goAcross, to),
     ];
 
-    return routes.reduce((previous, current) => {
+    let shortest = routes.reduce((previous, current) => {
         if (!previous || !current) {
             return previous || current;
         }
@@ -63,6 +83,12 @@ Board.prototype.getShortestRoute = function (from, to, memo = {}, path = [from])
 
         return previous;
     });
+
+    if (shortest) {
+        shortest = [from, ...shortest]
+    }
+
+    return shortest;
 }
 
 Board.prototype.disableSquare = function (x, y) {
@@ -73,16 +99,47 @@ Board.prototype.isSquareDisabled = function (x, y) {
     return this.disabledSquares.getValue(x, y);
 }
 
+function BoardMemo(width, height) {
+    Board.call(this, width, height);
+
+    this.memo = new Memo(); // TODO: clear memo when disabling squares
+}
+
+BoardMemo.prototype = {
+    ...Board.prototype,
+    getShortestRoute: function (from, to) {
+        const memo = this.memo;
+
+        if (memo) {
+            const value = memo.getValue(from, to);
+
+            if (typeof value !== 'undefined') {
+                return value;
+            }
+        }
+
+        const result = Board.prototype.getShortestRoute.call(this, from, to);
+
+        if (memo) {
+            memo.setValue(from, to, result);
+        }
+
+        return result;
+    },
+};
+
 test();
 
 function test() {
     shouldCreateBoard();
     shouldDisableSquare();
     shouldGetShortestRoute();
+    shouldGetShortestRouteMemo();
     shouldGetShortestRouteAroundDisabledSquares();
     shouldGetShortestRouteBelowDisabledSquares();
     shouldGetShortestRouteAboveDisabledSquares();
     benchmark();
+    benchmarkMemo();
 }
 
 function shouldCreateBoard() {
@@ -113,6 +170,18 @@ function shouldDisableSquare() {
 
 function shouldGetShortestRoute() {
     const board = new Board(7, 7);
+
+    shortest = board.getShortestRoute([0, 0], [6, 6]);
+
+    if (shortest.length !== 7) {
+        throw new Error('shouldGetShortestRoute');
+    }
+
+    console.log('OK');
+}
+
+function shouldGetShortestRouteMemo() {
+    const board = new BoardMemo(7, 7);
 
     shortest = board.getShortestRoute([0, 0], [6, 6]);
 
@@ -169,11 +238,21 @@ function shouldGetShortestRouteAboveDisabledSquares() {
 }
 
 function benchmark() {
-    console.time('shortest route 2');
+    console.time('shortest route');
 
     const board = new Board(10, 10);
 
     shortest = board.getShortestRoute([0, 0], [9, 9]);
 
-    console.timeEnd('shortest route 2');
+    console.timeEnd('shortest route');
+}
+
+function benchmarkMemo() {
+    console.time('shortest route memo');
+
+    const board = new BoardMemo(10, 10);
+
+    shortest = board.getShortestRoute([0, 0], [9, 9]);
+
+    console.timeEnd('shortest route memo');
 }
