@@ -73,6 +73,7 @@ function test() {
     shouldGetShortestRouteAroundDisabledSquares();
     shouldGetShortestRouteBelowDisabledSquares();
     shouldGetShortestRouteAboveDisabledSquares();
+    benchmark();
 }
 
 function shouldCreateBoard() {
@@ -156,4 +157,14 @@ function shouldGetShortestRouteAboveDisabledSquares() {
     }
 
     console.log('OK');
+}
+
+function benchmark() {
+    console.time('crude shortest route');
+
+    const board = new Board(10, 10);
+
+    shortest = board.getShortestRoute([0, 0], [9, 9]);
+
+    console.timeEnd('crude shortest route');
 }
