@@ -20,10 +20,10 @@ Matrix.prototype.getIndex = function (row, col) {
 }
 
 Matrix.prototype.rotate = function () {
-  this.rotateMatrix(this.data, 0, 0, this.size);
+  this._rotate(this.data, 0, 0, this.size);
 }
 
-Matrix.prototype.rotateMatrix = function (data, startRow, startCol, size) {
+Matrix.prototype._rotate = function (data, startRow, startCol, size) {
   const endRow = startRow + size - 1;
   const endCol = startCol + size - 1;
 
@@ -42,7 +42,7 @@ Matrix.prototype.rotateMatrix = function (data, startRow, startCol, size) {
   }
 
   if (size > 3) {
-    this.rotateMatrix(data, startRow + 1, startCol + 1, size - 2);
+    this._rotate(data, startRow + 1, startCol + 1, size - 2);
   }
 }
 
