@@ -79,14 +79,14 @@ LinkedList.prototype.sort = function () {
 
     let current = this.head;
 
-    while (current) {
+    while (current && current.next) {
       const next = current.next;
 
-      if (current.next && current.data > current.next.data) {
+      if (current.data > next.data) {
         const tmp = current.data;
 
-        current.data = current.next.data;
-        current.next.data = tmp;
+        current.data = next.data;
+        next.data = tmp;
 
         sorted = false;
       }
