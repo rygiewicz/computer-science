@@ -8,8 +8,14 @@ function LinkedList() {
 }
 
 LinkedList.prototype.add = function (data) {
+  const node = new LinkedListNode(data);
+
+  this.addNode(node);
+}
+
+LinkedList.prototype.addNode = function (node) {
   if (!this.head) {
-    this.head = new LinkedListNode(data);
+    this.head = node;
     return;
   }
 
@@ -19,7 +25,7 @@ LinkedList.prototype.add = function (data) {
     tail = tail.next;
   }
 
-  tail.next = new LinkedListNode(data);
+  tail.next = node;
 }
 
 LinkedList.prototype.get = function (index) {
