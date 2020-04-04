@@ -1,18 +1,3 @@
-LinkedList.prototype.addNode = function (node) {
-  if (!this.head) {
-    this.head = node;
-    return;
-  }
-
-  let tail = this.head;
-
-  while (tail.next) {
-    tail = tail.next;
-  }
-
-  tail.next = node;
-}
-
 function getIntersectingNode(list1, list2) {
   let current1 = list1.head;
 
