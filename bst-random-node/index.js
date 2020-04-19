@@ -93,7 +93,7 @@ function deleteDescendant(value, direction, parent) {
   let success = false;
 
   if (value === child.value) {
-    deleteChild(child, parent);
+    deleteChild(child, direction, parent);
 
     success = true;
   } else {
@@ -107,23 +107,21 @@ function deleteDescendant(value, direction, parent) {
   return success;
 }
 
-function deleteChild(child, parent) {
-  const dir = child === parent.left ? 'left' : 'right';
-
+function deleteChild(child, direction, parent) {
   if (!child.left && !child.right) {
-    parent[dir] = null;
+    parent[direction] = null;
 
     return;
   }
 
   if (child.left && !child.right) {
-    parent[dir] = child.left;
+    parent[direction] = child.left;
 
     return;
   }
 
   if (!child.left && child.right) {
-    parent[dir] = child.right;
+    parent[direction] = child.right;
 
     return;
   }
@@ -140,6 +138,12 @@ function deleteChild(child, parent) {
 }
 
 BinarySearchTree.prototype.delete = function (value) {
+  if (this.root.value === value) {
+    deleteChild(this.root, 'root', this);
+
+    return;
+  }
+
   deleteNode(value, this.root);
 }
 
@@ -152,6 +156,7 @@ function test() {
   shouldDeleteNode2();
   shouldHaveCorrectSize();
   shouldHaveCorrectSize2();
+  shouldDeleteRoot();
 }
 
 function shouldInsertNode() {
@@ -228,6 +233,31 @@ function shouldDeleteNode2() {
 
   if (tree.root.left.value !== 9) {
     throw new Error('shouldDeleteNode2');
+  }
+
+  console.log('OK');
+}
+
+function shouldDeleteRoot() {
+  const tree = new BinarySearchTree();
+
+  tree.insert(new TreeNode(20));
+  tree.insert(new TreeNode(8));
+  tree.insert(new TreeNode(29));
+  tree.insert(new TreeNode(12));
+  tree.insert(new TreeNode(33));
+  tree.insert(new TreeNode(7));
+  tree.insert(new TreeNode(3));
+  tree.insert(new TreeNode(16));
+  tree.insert(new TreeNode(9));
+  tree.insert(new TreeNode(10));
+  tree.insert(new TreeNode(24));
+  tree.insert(new TreeNode(25));
+
+  tree.delete(20);
+
+  if (tree.root.value !== 24) {
+    throw new Error('shouldDeleteRoot');
   }
 
   console.log('OK');
