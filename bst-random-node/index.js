@@ -74,36 +74,8 @@ function find(value, root) {
   return find(value, root.right);
 }
 
-function findParent(value, parent) {
-  if (value < parent.value) {
-    if (!parent.left) {
-      return;
-    }
-
-    if (value === parent.left.value) {
-      return [parent, LEFT, parent.left];
-    }
-
-    return findParent(value, parent.left);
-  }
-
-  if (!parent.right) {
-    return;
-  }
-
-  if (value === parent.right.value) {
-    return [parent, RIGHT, parent.right];
-  }
-
-  return findParent(value, parent.right);
-}
-
 BinarySearchTree.prototype.find = function (value) {
   return find(value, this.root);
-}
-
-BinarySearchTree.prototype.findParentOf = function (value) {
-  return findParent(value, this.root);
 }
 
 function deleteNode(value, parent) {
