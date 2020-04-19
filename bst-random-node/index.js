@@ -147,6 +147,39 @@ BinarySearchTree.prototype.delete = function (value) {
   deleteNode(value, this.root);
 }
 
+BinarySearchTree.prototype.getRandomNode = function () {
+  const treeSize = this.size();
+  const index = Math.round((treeSize - 1) * Math.random());
+
+  return getNodeAtIndex(index, this.root);
+}
+
+function getNodeAtIndex(index, root) {
+  if (index === 0) {
+    return root;
+  }
+
+  if (index >= root.size) {
+    throw new Error('index outside tree');
+  }
+
+  if (!root.left && !root.right) {
+    return null;
+  }
+
+  const leftSize = (root.left && root.left.size) || 0;
+
+  if (index === leftSize) {
+    return root;
+  }
+
+  if (index < leftSize) {
+    return getNodeAtIndex(index, root.left);
+  }
+
+  return getNodeAtIndex(index - leftSize - 1, root.right);
+}
+
 test();
 
 function test() {
@@ -157,6 +190,8 @@ function test() {
   shouldHaveCorrectSize();
   shouldHaveCorrectSize2();
   shouldDeleteRoot();
+  shouldGetRandomNode();
+  shouldGetNodeAtIndex();
 }
 
 function shouldInsertNode() {
@@ -296,6 +331,60 @@ function shouldHaveCorrectSize2() {
 
   if (result !== 4) {
     throw new Error('shouldHaveCorrectSize2');
+  }
+
+  console.log('OK');
+}
+
+function shouldGetRandomNode() {
+  const tree = new BinarySearchTree();
+
+  tree.insert(new TreeNode(20));
+  tree.insert(new TreeNode(8));
+  tree.insert(new TreeNode(29));
+  tree.insert(new TreeNode(12));
+  tree.insert(new TreeNode(33));
+  tree.insert(new TreeNode(7));
+  tree.insert(new TreeNode(3));
+  tree.insert(new TreeNode(16));
+  tree.insert(new TreeNode(9));
+  tree.insert(new TreeNode(10));
+  tree.insert(new TreeNode(24));
+  tree.insert(new TreeNode(25));
+
+  const result = tree.getRandomNode();
+
+  if (!result || typeof result.value !== 'number') {
+    throw new Error('shouldGetRandomNode');
+  }
+
+  console.log('OK');
+}
+
+function shouldGetNodeAtIndex() {
+  const tree = new BinarySearchTree();
+
+  const expected1 = new TreeNode(8);
+  const expected2 = new TreeNode(25);
+
+  tree.insert(new TreeNode(20));
+  tree.insert(expected1);
+  tree.insert(new TreeNode(29));
+  tree.insert(new TreeNode(12));
+  tree.insert(new TreeNode(33));
+  tree.insert(new TreeNode(7));
+  tree.insert(new TreeNode(3));
+  tree.insert(new TreeNode(16));
+  tree.insert(new TreeNode(9));
+  tree.insert(new TreeNode(10));
+  tree.insert(new TreeNode(24));
+  tree.insert(expected2);
+
+  const result1 = getNodeAtIndex(2, tree.root);
+  const result2 = getNodeAtIndex(9, tree.root);
+
+  if (result1 !== expected1 || result2 !== expected2) {
+    throw new Error('shouldGetNodeAtIndex');
   }
 
   console.log('OK');
