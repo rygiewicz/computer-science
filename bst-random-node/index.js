@@ -1,6 +1,3 @@
-const LEFT = 'left';
-const RIGHT = 'right';
-
 function TreeNode(value) {
   this.value = value;
   this.left = null;
@@ -111,53 +108,35 @@ function deleteDescendant(value, direction, parent) {
 }
 
 function deleteChild(child, parent) {
-  const dir = child === parent.left ? LEFT : RIGHT;
+  const dir = child === parent.left ? 'left' : 'right';
 
   if (!child.left && !child.right) {
-    if (dir === LEFT) {
-      parent.left = null;
-    }
-
-    parent.right = null;
+    parent[dir] = null;
 
     return;
   }
 
   if (child.left && !child.right) {
-    if (dir === LEFT) {
-      parent.left = child.left;
-    }
-
-    parent.right = child.left;
+    parent[dir] = child.left;
 
     return;
   }
 
   if (!child.left && child.right) {
-    if (dir === LEFT) {
-      parent.left = child.right;
-    }
-
-    parent.right = child.right;
+    parent[dir] = child.right;
 
     return;
   }
 
-  let minParent;
   let minNode = child.right;
 
   while (minNode.left) {
-    minParent = minNode;
     minNode = minNode.left;
   }
 
-  if (!minParent) {
-    return;
-  }
-
-  minParent.left = null;
-
   child.value = minNode.value;
+
+  deleteNode(minNode.value, child.right);
 }
 
 BinarySearchTree.prototype.delete = function (value) {
@@ -237,12 +216,13 @@ function shouldDeleteNode2() {
   tree.insert(new TreeNode(20));
   tree.insert(new TreeNode(8));
   tree.insert(new TreeNode(29));
-  tree.insert(new TreeNode(10));
+  tree.insert(new TreeNode(12));
   tree.insert(new TreeNode(33));
   tree.insert(new TreeNode(7));
   tree.insert(new TreeNode(3));
   tree.insert(new TreeNode(16));
   tree.insert(new TreeNode(9));
+  tree.insert(new TreeNode(10));
 
   tree.delete(8);
 
